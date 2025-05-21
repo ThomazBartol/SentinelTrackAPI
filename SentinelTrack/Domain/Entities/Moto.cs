@@ -10,7 +10,7 @@
 
         public string? Color { get; set; }
 
-        public int YardId { get; set; }       
+        public Guid YardId { get; set; }       
        
         public Yard Yard { get; set; }
     }
