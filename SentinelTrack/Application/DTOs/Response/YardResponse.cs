@@ -1,4 +1,6 @@
-﻿namespace SentinelTrack.Application.DTOs.Response
+﻿using SentinelTrack.Domain.Entities;
+
+namespace SentinelTrack.Application.DTOs.Response
 {
     public class YardResponse
     {
@@ -7,5 +9,6 @@
         public string Address { get; set; }
         public string PhoneNumber { get; set; }
         public int Capacity { get; set; }
+        public List<Moto> Motos { get; set; }
     }
 }

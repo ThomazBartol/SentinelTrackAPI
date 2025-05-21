@@ -17,9 +17,10 @@ namespace SentinelTrack.Presentation.Controllers
         private readonly YardRepository _yardRepository;
         private readonly IMapper _mapper;
 
-        public MotoController(MotoRepository repository, IMapper mapper)
+        public MotoController(MotoRepository repository, YardRepository yardRepository, IMapper mapper)
         {
             _repository = repository;
+            _yardRepository = yardRepository;
             _mapper = mapper;
         }
 
