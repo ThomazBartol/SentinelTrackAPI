@@ -6,6 +6,7 @@ namespace SentinelTrack.Presentation.Controllers
 {
     [ApiController]
     [Route("api/yards")]
+    [Tags("Pátios")]
     public class YardController : ControllerBase
     {
         private readonly YardRepository _repository = new();
