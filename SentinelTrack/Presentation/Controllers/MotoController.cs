@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using SentinelTrack.Application.DTOs.Response;
+using SentinelTrack.Application.DTOs.Request;
 using SentinelTrack.Domain.Entities;
 using SentinelTrack.Infrastructure.Repositories;
 
@@ -10,37 +13,45 @@ namespace SentinelTrack.Presentation.Controllers
     public class MotoController : ControllerBase
     {
         private readonly MotoRepository _repository;
+        private readonly IMapper _mapper;
 
-        public MotoController()
+        public MotoController(MotoRepository repository, IMapper mapper)
         {
-            _repository = new MotoRepository();
+            _repository = repository;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public ActionResult<List<Moto>> GetAll()
+        public ActionResult<List<MotoResponse>> GetAll()
         {
-            return Ok(_repository.GetAll());
+            var motos = _repository.GetAll();
+            var motoDtos = _mapper.Map<List<MotoResponse>>(motos);
+            return Ok(motoDtos);
         }
 
         [HttpGet("{id:guid}")]
-        public ActionResult<Moto> GetById(Guid id)
+        public ActionResult<MotoResponse> GetById(Guid id)
         {
             var moto = _repository.GetById(id);
-            return moto == null ? NotFound() : Ok(moto);
+            if (moto == null) return NotFound();
+            var motoDto = _mapper.Map<MotoResponse>(moto);
+            return Ok(motoDto);
         }
 
         [HttpPost]
-        public ActionResult<Moto> Create(Moto moto)
+        public ActionResult<MotoResponse> Create(MotoRequest request)
         {
+            var moto = _mapper.Map<Moto>(request);
             var createdMoto = _repository.Add(moto);
-            return CreatedAtAction(nameof(GetById), new { id = createdMoto.Id }, createdMoto);
+            var motoDto = _mapper.Map<MotoResponse>(createdMoto);
+            return CreatedAtAction(nameof(GetById), new { id = motoDto.Id }, motoDto);
         }
 
         [HttpPut("{id:guid}")]
-        public IActionResult Update(Guid id, Moto moto)
+        public IActionResult Update(Guid id, MotoRequest request)
         {
-            if (id != moto.Id) return BadRequest();
-
+            var moto = _mapper.Map<Moto>(request);
+            moto.Id = id;
             var success = _repository.Update(moto);
             return success ? NoContent() : NotFound();
         }
