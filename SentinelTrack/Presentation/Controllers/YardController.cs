@@ -13,12 +13,14 @@ namespace SentinelTrack.Presentation.Controllers
     [Tags("Pátios")]
     public class YardController : ControllerBase
     {
-        private readonly YardRepository _repository = new();
+        private readonly YardRepository _repository;
+        private readonly MotoRepository _motosRepository;
         private readonly IMapper _mapper;
 
-        public YardController(YardRepository repository, IMapper mapper)
+        public YardController(YardRepository repository, MotoRepository motosRepository, IMapper mapper)
         {
             _repository = repository;
+            _motosRepository = motosRepository;
             _mapper = mapper;
         }
 
@@ -29,7 +31,19 @@ namespace SentinelTrack.Presentation.Controllers
         public ActionResult<List<YardResponse>> GetAll()
         {
             var yards = _repository.GetAll();
-            var yardDtos = _mapper.Map<List<YardResponse>>(yards);
+
+            var motos = _motosRepository.GetAll();
+
+            var yardDtos = yards.Select(yard =>
+            {
+                var yardDto = _mapper.Map<YardResponse>(yard);
+
+                var motosNoYard = motos.Where(m => m.YardId == yard.Id).ToList();
+
+                yardDto.Motos = _mapper.Map<List<MotoResponse>>(motosNoYard);
+
+                return yardDto;
+            }).ToList();
             return Ok(yardDtos);
         }
 

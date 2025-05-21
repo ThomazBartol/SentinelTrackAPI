@@ -10,7 +10,9 @@ namespace SentinelTrack.Application.Mappings
         public YardMapping() 
         {
             CreateMap<YardRequest, Yard>();
-            CreateMap<Yard, YardResponse>();
+            CreateMap<Yard, YardResponse>()
+            .ForMember(dest => dest.Motos, opt => opt.MapFrom(src => src.Motos));
+            CreateMap<Moto, MotoResponse>();
         }
     }
 }

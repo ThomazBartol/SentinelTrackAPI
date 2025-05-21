@@ -1,5 +1,4 @@
 ﻿using SentinelTrack.Domain.Entities;
-using System.Xml.Linq;
 
 namespace SentinelTrack.Infrastructure.Repositories
 {

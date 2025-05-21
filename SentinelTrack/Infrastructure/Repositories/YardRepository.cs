@@ -1,10 +1,10 @@
 ﻿using SentinelTrack.Domain.Entities;
-using System.Xml.Linq;
 
 namespace SentinelTrack.Infrastructure.Repositories
 {
     public class YardRepository
     {
+
         private static readonly List<Yard> _yards = new();
 
         public List<Yard> GetAll()
@@ -46,4 +46,5 @@ namespace SentinelTrack.Infrastructure.Repositories
             return true;
         }
     }
+
 }

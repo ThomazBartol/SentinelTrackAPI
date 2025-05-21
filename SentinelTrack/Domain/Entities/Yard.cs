@@ -12,6 +12,6 @@
       
         public int? Capacity { get; set; }
 
-        public List<Moto> Motos { get; set; } = new List<Moto>();
+        public ICollection<Moto> Motos { get; set; } = new List<Moto>();
     }
 }
