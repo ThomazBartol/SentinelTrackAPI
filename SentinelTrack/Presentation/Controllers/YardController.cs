@@ -54,8 +54,15 @@ namespace SentinelTrack.Presentation.Controllers
         public ActionResult<YardResponse> GetById(Guid id)
         {
             var yard = _repository.GetById(id);
+
             if (yard == null) return NotFound();
+
+            var motosNoYard = _motosRepository.GetAll().Where(m => m.YardId == id).ToList();
+
             var yardDto = _mapper.Map<YardResponse>(yard);
+
+            yardDto.Motos = _mapper.Map<List<MotoResponse>>(motosNoYard);
+
             return Ok(yardDto);
         }
 
@@ -84,6 +91,12 @@ namespace SentinelTrack.Presentation.Controllers
             if (request.Capacity <= 0)
             {
                 return BadRequest("A capacidade do pátio deve ser maior que 0.");
+            }
+
+            int motosNoYard = _motosRepository.GetAll().Count(m => m.YardId == id);
+            if (request.Capacity < motosNoYard)
+            {
+                return BadRequest($"Não é possível reduzir a capacidade do pátio para menos do que o número de motos existentes. Motos atuais: {motosNoYard}.");
             }
 
             var yard = _mapper.Map<Yard>(request);
