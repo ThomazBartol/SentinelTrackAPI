@@ -2,13 +2,13 @@
 {
     public class Moto
     {
-        public Guid Id { get; private set; }
+        public Guid Id { get; set; }
 
-        public string Plate { get; private set; }
+        public string Plate { get; set; }
 
-        public string? Model { get; private set; }
+        public string? Model { get; set; }
 
-        public string? Color { get; private set; }
+        public string? Color { get; set; }
 
         public int YardId { get; set; }       
        
