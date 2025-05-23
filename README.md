@@ -1,6 +1,8 @@
 # SentinelTrack API
 
-API para gerenciamento de pátios e motos, desenvolvida com .NET 8, EF Core e Oracle.
+**SentinelTrack** é uma API REST desenvolvida em .NET 8 com Entity Framework Core e banco de dados Oracle, criada para gerenciar o fluxo de **motos** em **pátios**. O projeto simula um sistema de controle de operações para uma empresa de aluguel de motos, com regras de capacidade, alocação e gerenciamento de veículos.
+
+A aplicação oferece endpoints organizados para cadastro, listagem, atualização e exclusão de pátios e motos, incluindo validações e filtros. O projeto foi desenvolvido como parte de um desafio técnico proposto pela **Mottu**.
 
 ## Rotas Disponíveis
 
