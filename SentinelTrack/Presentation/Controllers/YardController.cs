@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using SentinelTrack.Application.DTOs.Response;
+using Microsoft.EntityFrameworkCore;
 using SentinelTrack.Application.DTOs.Request;
+using SentinelTrack.Application.DTOs.Response;
 using SentinelTrack.Domain.Entities;
-using SentinelTrack.Infrastructure.Repositories;
+using SentinelTrack.Infrastructure.Context;
 using System.Net;
 
 namespace SentinelTrack.Presentation.Controllers
@@ -13,14 +14,12 @@ namespace SentinelTrack.Presentation.Controllers
     [Tags("Pátios")]
     public class YardController : ControllerBase
     {
-        private readonly YardRepository _repository;
-        private readonly MotoRepository _motosRepository;
+        private readonly AppDbContext _context;
         private readonly IMapper _mapper;
 
-        public YardController(YardRepository repository, MotoRepository motosRepository, IMapper mapper)
+        public YardController(AppDbContext context, IMapper mapper)
         {
-            _repository = repository;
-            _motosRepository = motosRepository;
+            _context = context;
             _mapper = mapper;
         }
 
@@ -28,39 +27,35 @@ namespace SentinelTrack.Presentation.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public ActionResult<List<YardResponse>> GetAll()
+        public async Task<ActionResult<List<YardResponse>>> GetAll()
         {
-            var yards = _repository.GetAll();
-
-            var motos = _motosRepository.GetAll();
+            var yards = await _context.Yards.ToListAsync();
+            var motos = await _context.Motos.ToListAsync();
 
             var yardDtos = yards.Select(yard =>
             {
                 var yardDto = _mapper.Map<YardResponse>(yard);
-
                 var motosNoYard = motos.Where(m => m.YardId == yard.Id).ToList();
-
                 yardDto.Motos = _mapper.Map<List<MotoResponse>>(motosNoYard);
-
                 return yardDto;
             }).ToList();
+
             return Ok(yardDtos);
         }
 
         [HttpGet("{id:guid}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public ActionResult<YardResponse> GetById(Guid id)
+        public async Task<ActionResult<YardResponse>> GetById(Guid id)
         {
-            var yard = _repository.GetById(id);
-
+            var yard = await _context.Yards.FindAsync(id);
             if (yard == null) return NotFound();
 
-            var motosNoYard = _motosRepository.GetAll().Where(m => m.YardId == id).ToList();
+            var motosNoYard = await _context.Motos.Where(m => m.YardId == id).ToListAsync();
 
             var yardDto = _mapper.Map<YardResponse>(yard);
-
             yardDto.Motos = _mapper.Map<List<MotoResponse>>(motosNoYard);
 
             return Ok(yardDto);
@@ -69,7 +64,7 @@ namespace SentinelTrack.Presentation.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(YardResponse), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public ActionResult<YardResponse> Create(YardRequest request)
+        public async Task<ActionResult<YardResponse>> Create(YardRequest request)
         {
             if (request.Capacity <= 0)
             {
@@ -77,8 +72,10 @@ namespace SentinelTrack.Presentation.Controllers
             }
 
             var yard = _mapper.Map<Yard>(request);
-            var createdYard = _repository.Add(yard);
-            var yardDto = _mapper.Map<YardResponse>(createdYard);
+            _context.Yards.Add(yard);
+            await _context.SaveChangesAsync();
+
+            var yardDto = _mapper.Map<YardResponse>(yard);
             return CreatedAtAction(nameof(GetById), new { id = yardDto.Id }, yardDto);
         }
 
@@ -86,33 +83,45 @@ namespace SentinelTrack.Presentation.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Update(Guid id, YardRequest request)
+        public async Task<IActionResult> Update(Guid id, YardRequest request)
         {
             if (request.Capacity <= 0)
             {
                 return BadRequest("A capacidade do pátio deve ser maior que 0.");
             }
 
-            int motosNoYard = _motosRepository.GetAll().Count(m => m.YardId == id);
+            var motosNoYard = await _context.Motos.CountAsync(m => m.YardId == id);
             if (request.Capacity < motosNoYard)
             {
                 return BadRequest($"Não é possível reduzir a capacidade do pátio para menos do que o número de motos existentes. Motos atuais: {motosNoYard}.");
             }
 
-            var yard = _mapper.Map<Yard>(request);
-            yard.Id = id;
-            var success = _repository.Update(yard);
-            return success ? NoContent() : NotFound();
+            var yard = await _context.Yards.FindAsync(id);
+            if (yard == null) return NotFound();
+
+            // Atualiza os campos permitidos
+            yard.Name = request.Name;
+            yard.Capacity = request.Capacity;
+
+            _context.Yards.Update(yard);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpDelete("{id:guid}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var success = _repository.Remove(id);
-            return success ? NoContent() : NotFound();
+            var yard = await _context.Yards.FindAsync(id);
+            if (yard == null) return NotFound();
+
+            _context.Yards.Remove(yard);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
