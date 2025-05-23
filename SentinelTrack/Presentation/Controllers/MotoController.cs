@@ -27,9 +27,25 @@ namespace SentinelTrack.Presentation.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<MotoResponse>>> GetAll()
+        public async Task<ActionResult<List<MotoResponse>>> GetAll(
+            [FromQuery] Guid? yardId,
+            [FromQuery] string? color,
+            [FromQuery] string? model)
         {
-            var motos = await _context.Motos.ToListAsync();
+            IQueryable<Moto> query = _context.Motos.AsQueryable();
+            if (yardId.HasValue)
+            {
+                query = query.Where(m => m.YardId == yardId.Value);
+            }
+            if (!string.IsNullOrEmpty(color))
+            {
+                query = query.Where(m => m.Color != null && m.Color.ToLower() == color.ToLower());
+            }
+            if (!string.IsNullOrEmpty(model))
+            {
+                query = query.Where(m => m.Model != null && m.Model.ToLower() == model.ToLower());
+            }
+            var motos = await query.ToListAsync();
             var motoDtos = _mapper.Map<List<MotoResponse>>(motos);
             return Ok(motoDtos);
         }

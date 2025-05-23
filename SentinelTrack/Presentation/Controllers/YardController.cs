@@ -27,10 +27,29 @@ namespace SentinelTrack.Presentation.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<List<YardResponse>>> GetAll()
+        public async Task<ActionResult<List<YardResponse>>> GetAll(
+            [FromQuery] int? capacityMin,
+            [FromQuery] int? capacityMax,
+            [FromQuery] bool? hasSpace)
         {
-            var yards = await _context.Yards.ToListAsync();
-            var motos = await _context.Motos.ToListAsync();
+            IQueryable<Yard> query = _context.Yards.AsQueryable();
+
+            if (capacityMin.HasValue)
+                query = query.Where(y => y.Capacity >= capacityMin.Value);
+
+            if (capacityMax.HasValue)
+                query = query.Where(y => y.Capacity <= capacityMax.Value);
+
+            if (hasSpace.HasValue && hasSpace.Value)
+            {
+                query = query.Where(y =>
+                    _context.Motos.Count(m => m.YardId == y.Id) < y.Capacity);
+            }
+
+            var yards = await query.ToListAsync();
+
+            var yardIds = yards.Select(y => y.Id).ToList();
+            var motos = await _context.Motos.Where(m => yardIds.Contains(m.YardId)).ToListAsync();
 
             var yardDtos = yards.Select(yard =>
             {
