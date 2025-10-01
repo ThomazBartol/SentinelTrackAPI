@@ -81,14 +81,64 @@ A aplicação oferece endpoints organizados para cadastro, listagem, atualizaç�
 
 4. Rode o projeto com o comando:
    ```bash
+   cd SentinelTrack/
    dotnet run
 
 5. Caso o Swagger não abra sozinho acesse em:
    https://localhost:5000/swagger/index.html
 
+---
+
 ## 👥 INTEGRANTES DO GRUPO
-===========================
 
 - RM555323 - Thomaz Oliveira Vilas Boas Bartol
 - RM556089 - Vinicius Souza Carvalho
 - RM556972 - Gabriel Duarte Pinto
+
+---
+
+## 📌 Exemplos de Uso (cURL)
+
+> Usando http para não dar erro nas requisições
+
+### Listar usuários
+
+```powershell
+curl -X GET "http://localhost:5000/api/v1/users?page=1&pageSize=10"
+```
+
+### Criando um usuário
+
+```powershell
+curl -X POST "http://localhost:5000/api/v1/users" -H "Content-Type: application/json" -d '{
+  "Name": "Maria Souza",
+  "email": "maria.souza@example.com", 
+  "Role": "admin"
+}'
+```
+
+### Atualizando um usuário
+
+```powershell
+curl -X PUT "http://localhost:5000/api/v1/users/790d6edb-c9d3-4f28-8cdc-ffefc7a1e726" \
+-H "Content-Type: application/json" \
+-d '{
+  "Name": "Maria Souza Atualizada",
+  "email": "maria.nova@example.com",
+  "Role": "admin"
+}'
+```
+
+### Listando todos os pátios
+
+```powershell
+curl -X GET "http://localhost:5000/api/v1/yards?page=1&pageSize=10"
+```
+
+---
+
+## Testes Automatizados
+Rodar os testes:
+```
+dotnet test
+```
