@@ -8,43 +8,59 @@ A aplicação oferece endpoints organizados para cadastro, listagem, atualizaç�
 
 ---
 
-### Pátios (`/api/yards`)
+### Pátios (`/api/v1/yards`)
 
-- **GET /api/yards** — Lista os pátios, com filtros opcionais via query params:
+- **GET /api/v1/yards** — Lista os pátios, com filtros opcionais via query params:
 
   | Query Param  | Tipo    | Descrição                                    | Exemplo         |
   |--------------|---------|----------------------------------------------|-----------------|
-  | capacityMin  | integer | Filtra pátios com capacidade mínima          | `/api/yards?capacityMin=10` |
-  | capacityMax  | integer | Filtra pátios com capacidade máxima           | `/api/yards?capacityMax=50` |
-  | hasSpace     | boolean | Se true, filtra pátios que ainda têm espaço disponível | `/api/yards?hasSpace=true`  |
+  | capacityMin  | integer | Filtra pátios com capacidade mínima          | `/api/v1/yards?capacityMin=10` |
+  | capacityMax  | integer | Filtra pátios com capacidade máxima           | `/api/v1/yards?capacityMax=50` |
 
-- **GET /api/yards/{id}** — Busca pátio pelo ID.
+- **GET /api/v1/yards/{id}** — Busca pátio pelo ID.
 
-- **POST /api/yards** — Cria um novo pátio.
+- **POST /api/v1/yards** — Cria um novo pátio.
 
-- **PUT /api/yards/{id}** — Atualiza um pátio existente.
+- **PUT /api/v1/yards/{id}** — Atualiza um pátio existente.
 
-- **DELETE /api/yards/{id}** — Remove um pátio.
+- **DELETE /api/v1/yards/{id}** — Remove um pátio.
 
 ---
 
-### Motos (`/api/motos`)
+### Motos (`/api/v1/motos`)
 
-- **GET /api/motos** — Lista motos, com filtros opcionais via query params:
+- **GET /api/v1/motos** — Lista motos, com filtros opcionais via query params:
 
   | Query Param | Tipo    | Descrição                        | Exemplo               |
   |-------------|---------|----------------------------------|-----------------------|
-  | yardId      | GUID    | Filtra motos pelo ID do pátio     | `/api/motos?yardId=abc123` |
-  | color       | string  | Filtra motos pela cor             | `/api/motos?color=red`       |
-  | model       | string  | Filtra motos pelo modelo          | `/api/motos?model=Honda`     |
+  | yardId      | GUID    | Filtra motos pelo ID do pátio     | `/api/v1/motos?yardId=abc123` |
+  | plate       | string  | Filtra motos pela placa             | `/api/v1/motos?plate=ABC1D123`       |
 
-- **GET /api/motos/{id}** — Busca moto pelo ID.
+- **GET /api/v1/motos/{id}** — Busca moto pelo ID.
 
-- **POST /api/motos** — Cria uma nova moto.
+- **POST /api/v1/motos** — Cria uma nova moto.
 
-- **PUT /api/motos/{id}** — Atualiza uma moto existente.
+- **PUT /api/v1/motos/{id}** — Atualiza uma moto existente.
 
-- **DELETE /api/motos/{id}** — Remove uma moto.
+- **DELETE /api/v1/motos/{id}** — Remove uma moto.
+
+---
+
+### Usuários (`/api/v1/users`)
+
+- **GET /api/v1/users** — Lista usuários, com filtros opcionais via query params:
+
+  | Query Param | Tipo    | Descrição                        | Exemplo               |
+  |-------------|---------|----------------------------------|-----------------------|
+  | email       | string  | Filtra usuário pelo email        | `/api/v1/users?email=email@gmail.com`       |
+
+- **GET /api/v1/users/{id}** — Busca usuário pelo ID.
+
+- **POST /api/v1/users** — Cria um novo usuário.
+
+- **PUT /api/v1/users/{id}** — Atualiza um usuário existente.
+
+- **DELETE /api/v1/users/{id}** — Remove um usuário.
 
 ---
 
@@ -55,17 +71,20 @@ A aplicação oferece endpoints organizados para cadastro, listagem, atualizaç�
    git clone https://github.com/ThomazBartol/SentinelTrackAPI.git
    cd SentinelTrackAPI/
 
-2. Crie dentro da pasta SentinelTrack (no mesmo diretório que o .csproj):
-    arquivo .env contendo:
+2. Faça o restore:
    ```bash
-   ORACLE_CONNECTION_STRING=User Id={usuário};Password={senha};Data Source=oracle.fiap.com.br:1521/ORCL
+   dotnet restore
+
+3. Build o projeto com o comando:
+   ```bash
+   dotnet build
 
 4. Rode o projeto com o comando:
    ```bash
    dotnet run
 
 5. Caso o Swagger não abra sozinho acesse em:
-   https://localhost:7170/swagger/index.html
+   https://localhost:5000/swagger/index.html
 
 ## 👥 INTEGRANTES DO GRUPO
 ===========================
