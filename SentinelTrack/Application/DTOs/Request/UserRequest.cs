@@ -2,12 +2,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SentinelTrack.Application.DTOs.Request
 {
-    public class YardRequest
+    public class UserRequest
     {
         [Required]
         public string Name { get; set; } = default!;
-        public string? Address { get; set; }
-        public string? PhoneNumber { get; set; }
-        public int? Capacity { get; set; }
+        [Required, EmailAddress]
+        public string Email { get; set; } = default!;
+        public string Role { get; set; } = "user";
     }
 }
